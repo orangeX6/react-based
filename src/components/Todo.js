@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import usePrevious from '../utils/usePrevious';
 
 export default function Todo(props) {
   const [isEditing, setEditing] = useState(false);
   const [name, setName] = useState('');
-
+  const editFieldRef = useRef(null);
+  const editButtonRef = useRef(null);
+  const wasEditing = usePrevious(isEditing);
+  // console.log(isEditing, wasEditing);
   const handleSubmit = (e) => {
     e.preventDefault();
     props.editTask(props.id, name);
@@ -27,6 +31,7 @@ export default function Todo(props) {
           type="text"
           value={name}
           onChange={handleChange}
+          ref={editFieldRef}
         />
       </div>
       <div className="btn-group">
@@ -60,8 +65,13 @@ export default function Todo(props) {
         </label>
       </div>
       <div className="btn-group">
-        <button type="button" className="btn" onClick={() => setEditing(true)}>
-          Edit <span className="visually-hidden">{props.name}</span>
+        <button
+          type="button"
+          className="btn"
+          onClick={() => setEditing(true)}
+          ref={editButtonRef}
+        >
+          Edit <span className="visually-hidden">{props.name} </span>
         </button>
         <button
           type="button"
@@ -74,5 +84,24 @@ export default function Todo(props) {
     </div>
   );
 
+  // useEffect(() => console.log('side effect'));
+  // console.log('main render');
+  // useEffect(() => {
+  //   if (!wasEditing && isEditing) {
+  //     editFieldRef.current.focus();
+  //   }
+  //   if (wasEditing && !isEditing) {
+  //     editButtonRef.current.focus();
+  //   }
+  // }, [wasEditing, isEditing]);
+
+  useEffect(() => {
+    if (isEditing && !wasEditing) {
+      editFieldRef.current.focus();
+    }
+    if (wasEditing && !isEditing) {
+      editButtonRef.current.focus();
+    }
+  }, [isEditing, wasEditing]);
   return <li className="todo">{isEditing ? editingTemplate : viewTemplate}</li>;
 }
