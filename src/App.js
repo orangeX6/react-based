@@ -28,6 +28,7 @@ function App(props) {
   const [filter, setFilter] = useState('All');
 
   function addTask(name) {
+    if (!name) return;
     const newTask = { id: `todo-${nanoid()}`, name: name, completed: false };
     setTasks([...tasks, newTask]);
   }
